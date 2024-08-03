@@ -264,6 +264,9 @@ class FinetuneDataCollatorWithPadding:
         '''
         
         batch_item_seq, labels = self.sample_train_data(batch_item_ids)
+        print(batch_item_seq)
+        
+        print(batch_item_seq.shape )
         batch_feature = self.extract_features(batch_item_seq)
         batch_encode_features = self.encode_features(batch_feature)
         batch = self.tokenizer.padding(batch_encode_features, pad_to_max=False)
