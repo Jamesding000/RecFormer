@@ -177,20 +177,27 @@ def eval(model, dataloader, args):
 
 from tqdm import tqdm
 
-def train_one_iteration(model, dataloader, optimizer, scheduler, scaler, args, steps):
+def train_one_iteration(model, dataloader, optimizer, scheduler, scaler, args, steps, train_dataset, finetune_data_collator):
     model.train()
     total_loss = 0
     
     # Initialize tqdm progress bar
     progress_bar = tqdm(range(steps), ncols=100, desc='Training')
+
+    # Convert dataloader to an iterator
+    data_iter = iter(dataloader)
     
     for step in progress_bar:
         try:
-            batch = next(dataloader)
+            batch = next(data_iter)
         except StopIteration:
             # Reinitialize iterator if we've reached the end of the dataset
-            dataloader = iter(dataloader.dataset)
-            batch = next(dataloader)
+            dataloader = DataLoader(train_dataset, 
+                        batch_size=args.batch_size, 
+                        shuffle=True, 
+                        collate_fn=finetune_data_collator)
+            data_iter = iter(dataloader)
+            batch = next(data_iter)
 
         for k, v in batch.items():
             batch[k] = v.to(args.device)
@@ -229,7 +236,8 @@ def train_one_iteration(model, dataloader, optimizer, scheduler, scaler, args, s
         # Update progress bar with current loss
         progress_bar.set_postfix({'loss': total_loss / (step + 1)})
     
-    return dataloader
+    return data_iter
+
 
 
 def main():
@@ -404,7 +412,7 @@ def main():
             model.init_item_embedding(item_embeddings)
             train_iter = iter(train_loader)
 
-        train_iter = train_one_iteration(model, train_iter, optimizer, scheduler, scaler, args, args.steps_per_iteration)
+        train_iter = train_one_iteration(model, train_iter, optimizer, scheduler, scaler, args, args.steps_per_iteration, datasets['train'], finetune_data_collator)
         
         if (iteration + 1) % args.verbose == 0:
             dev_metrics = eval(model, dev_loader, args)
@@ -430,7 +438,7 @@ def main():
         if not train_iter:
             train_iter = iter(train_loader)
 
-        train_iter = train_one_iteration(model, train_iter, optimizer, scheduler, scaler, args, args.steps_per_iteration)
+        train_iter = train_one_iteration(model, train_iter, optimizer, scheduler, scaler, args, args.steps_per_iteration, datasets['train'], finetune_data_collator)
         
         if (iteration + 1) % args.verbose == 0:
             dev_metrics = eval(model, dev_loader, args)
