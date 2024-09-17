@@ -21,6 +21,7 @@ with open(file_path, 'r') as file:
 
 item2id = {}
 
+# remove the [PAD] in item2id
 for k,v in data_maps['item2id'].items():
     if k != '[PAD]':
         item2id[k] = v - 1
@@ -33,7 +34,7 @@ meta_dataset = load_dataset(
 )
 
 meta_dataset = meta_dataset.filter(lambda t: t['parent_asin'] in item2id)
-print(f'{len(meta_dataset)} of {len(item2id) - 1} items have meta data.')
+print(f'{len(meta_dataset)} of {len(item2id)} items have meta data.')
 
 meta_data = dict()
 for line in tqdm(meta_dataset):

@@ -1,5 +1,41 @@
 # Learning Language Representations for Sequential Recommendation
 
+> **Note**: This repository is a fork of the original Recformer repository. The additional documentation below outlines the changes made to adapt the finetuning steps for our processed datasets. The original documentation follows after this section.
+
+## SpecGR Adaptation
+
+### Current Symptoms
+- Train loss decreases slowly and fails to converge within a reasonable timeframe. Tried larger learning rate, but has not improved the situation.
+
+### TODO List
+- [ ] Amazon 2023 dataset has no 'brand' attribute in item meta data. Check if that will significantly impact Recformer's performance.
+- [ ] Recformer used 0-based indexing in item id, but SpecGR datasets are 1-based. Check if there are off-by-1 error during the data processing and data collating steps.
+- [ ] Check if the data loading and collating logic (as described in 'Main Adaptations: item 1') is reasonable.
+- [ ] Tune hyperparameters.
+
+### Main Adaptations
+- In the original Recformer dataloader, one sub-sequence of purchase history per user is sampled during each epoch. However, in SpecGR, datasets are processed and stored by examples, not by users (since we split the examples into in-sample and unseen test sets for evaluation). To mimic the original logic, we sample `U` (number of users) examples from the training set in each iteration (comparable to an epoch in the original Recformer implementation). We train for the same number of iterations and perform pre-iteration item re-encoding as required.
+  
+- Due to limited computational resources, we set smaller values for `num_iterations` and `steps_per_iteration` in `finetune_Games.sh`. You can adjust these hyperparameters as needed in both `finetune_Games.sh` and `finetune_new.py`.
+
+### Steps to Run Recformer Finetuning on the SpecGR `Video Games` Dataset:
+
+1. Download the Recformer pretrained checkpoints by following the instructions below.
+
+2. Download and process datasets from scratch:
+    ```bash
+    python -m dataset.process_datasets --config CONFIG_PATH --device GPU_ID
+    ```
+
+3. Finetune Recformer on the processed datasets:
+    ```bash
+    bash finetune_Games.sh
+    ```
+
+---
+
+Below is the original documentation from the repository:
+
 This repository contains the replication of the paper **"Text Is All You Need: Learning Language Representations for Sequential Recommendation"**, a model learns natural language representations for sequential recommendation.
 
 The KDD 2023 paper [Text Is All You Need: Learning Language Representations for Sequential Recommendation](https://arxiv.org/abs/2305.13731).

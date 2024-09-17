@@ -1,0 +1,4 @@
+max_history_len: 20
+eval_ks: [10, 50]
+val_metric: ndcg_10
+num_workers: 4

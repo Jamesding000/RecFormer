@@ -1,0 +1,5 @@
+dataset: Cell_Phones_and_Accessories
+exp_id: ''
+unseen_start_index: 94609
+test_start_index: 103084
+num_workers: 4
