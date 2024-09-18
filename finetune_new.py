@@ -405,8 +405,8 @@ def main():
     else:
         scaler = None
 
-    # test_metrics = eval(model, test_loader, args)
-    # print(f'Test set: {test_metrics}')
+    dev_metrics = eval(model, dev_loader, args)
+    print(f'Dev set: {dev_metrics}')
     
     best_target = float('-inf')
     patient = 5

@@ -3,7 +3,7 @@ python finetune_data/process_new.py \
 
 python finetune_new.py \
     -d Video_Games \
-    --pretrain_ckpt pretrain_ckpt/recformer_ckpt.bin \
+    --pretrain_ckpt pretrain_ckpt/recformer_seqrec_ckpt.bin \
     --data_path finetune_data/Video_Games \
     --num_iterations 128 \
     --steps_per_iteration 6000 \

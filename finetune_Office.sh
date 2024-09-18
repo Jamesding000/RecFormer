@@ -3,7 +3,7 @@ python finetune_data/process_new.py \
 
 python finetune_new.py \
     -d Office_Products \
-    --pretrain_ckpt pretrain_ckpt/recformer_ckpt.bin \
+    --pretrain_ckpt pretrain_ckpt/recformer_seqrec_ckpt.bin \
     --data_path finetune_data/Office_Products \
     --num_iterations 64 \
     --steps_per_iteration 7500 \
