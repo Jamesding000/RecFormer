@@ -26,6 +26,7 @@
     ```bash
     python -m dataset.process_datasets --config CONFIG_PATH --device GPU_ID
     ```
+    or download the processed dataset [here](https://drive.google.com/drive/folders/1RJLPfRjFMuXy3-KZWK534EKZ3y2SoZQV?usp=drive_link)
 
 3. Finetune Recformer on the processed datasets:
     ```bash
