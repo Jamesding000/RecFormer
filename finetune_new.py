@@ -414,10 +414,12 @@ def main():
     train_iter = iter(train_loader)
 
     for iteration in range(args.num_iterations):
-        if iteration == 0 or not train_iter:
-            item_embeddings = encode_all_items(model.longformer, tokenizer, tokenized_items, args)
-            model.init_item_embedding(item_embeddings)
-            train_iter = iter(train_loader)
+        # Follow Recformer to reencode items every epoch (here iteration)
+        item_embeddings = encode_all_items(model.longformer, tokenizer, tokenized_items, args)
+        model.init_item_embedding(item_embeddings)
+        
+        # if not train_iter:
+        #     train_iter = iter(train_loader)
 
         train_iter = train_one_iteration(model, train_iter, optimizer, scheduler, scaler, args, args.steps_per_iteration, datasets['train'], finetune_data_collator)
         
@@ -442,8 +444,8 @@ def main():
     train_iter = iter(train_loader)
 
     for iteration in range(args.num_iterations):
-        if not train_iter:
-            train_iter = iter(train_loader)
+        # if not train_iter:
+        #     train_iter = iter(train_loader)
 
         train_iter = train_one_iteration(model, train_iter, optimizer, scheduler, scaler, args, args.steps_per_iteration, datasets['train'], finetune_data_collator)
         

@@ -1,6 +1,8 @@
 python finetune_data/process_new.py \
     -d Video_Games
 
+# --steps_per_iteration should be set to #Users / batch_size to follow the original paper
+# total iterations = num_iterations * steps_per_iteration should be set to a fixed value across all datasets
 python finetune_new.py \
     -d Video_Games \
     --pretrain_ckpt pretrain_ckpt/recformer_seqrec_ckpt.bin \
