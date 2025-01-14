@@ -1,6 +1,7 @@
 import json
 import torch
 import torch.nn as nn
+import numpy as np
 
 MAX_VAL = 1e4
 
@@ -79,7 +80,28 @@ class Ranker(nn.Module):
         self.ks = metrics_ks
         self.ce = nn.CrossEntropyLoss()
         
-    def forward(self, scores, labels):
+    def forward(self, scores, labels, save_pred_path):
+        
+        def get_matches_array(rank):
+            # Assuming rank is a torch tensor of size [batch_size, ] and contains float values
+            batch_size = rank.size(0)
+            max_k = max(self.ks)
+
+            # Initialize a zero-filled NumPy array of size [batch_size, max(self.ks)]
+            match_array = np.zeros((batch_size, max_k), dtype=np.float32)
+
+            # Convert rank to integers and ensure it is on CPU for NumPy compatibility
+            rank_indices = rank.long().cpu().numpy()  # Convert to integers and NumPy
+
+            # Iterate over the batch and set the corresponding index to 1
+            for i in range(batch_size):
+                if rank_indices[i] < max_k:  # Ensure rank does not exceed max_k
+                    match_array[i, rank_indices[i]] = 1
+
+            # print(match_array, match_array.shape)
+            
+            return match_array
+        
         labels = labels.squeeze()
         
         try:
@@ -104,5 +126,11 @@ class Ranker(nn.Module):
             )
         res.append((1 / (rank+1)).mean().item()) # MRR
         res.append((1 - (rank/valid_length)).mean().item()) # AUC
+        
+        match_array = get_matches_array(rank)
+        with open(save_pred_path, "a") as f:
+            for label, match in zip(labels.cpu().numpy(), match_array):
+                # print('label', label, 'match', match)
+                f.write(f"\"{label}\",\"{match.astype(int).tolist()}\"\n")
 
         return res + [loss]
